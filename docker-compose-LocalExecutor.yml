@@ -12,8 +12,10 @@ services:
                 max-file: "3"
 
     webserver:
-        image: puckel/docker-airflow:1.10.7
+        image: puckel/docker-airflow:1.10.7-mremes
         restart: always
+        env_file:
+            - admin/connections.env
         depends_on:
             - postgres
         environment:
@@ -25,7 +27,9 @@ services:
                 max-file: "3"
         volumes:
             - ./dags:/usr/local/airflow/dags
-            # - ./plugins:/usr/local/airflow/plugins
+            - ./plugins:/usr/local/airflow/plugins
+            - ./requirements.txt:/requirements.txt
+            - ./admin:/usr/local/airflow/admin
         ports:
             - "8080:8080"
         command: webserver

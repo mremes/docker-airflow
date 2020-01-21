@@ -69,9 +69,24 @@ if [ "$AIRFLOW__CORE__EXECUTOR" = "CeleryExecutor" ]; then
   wait_for_port "Redis" "$REDIS_HOST" "$REDIS_PORT"
 fi
 
+import_variables() {
+  echo "Importing variables"
+
+  python << EOF
+import json
+from airflow.models import Variable
+
+with open('./admin/variables.json') as f:
+  variables = json.load(f)
+  for k, v in variables.items():
+    Variable.set(k, v)
+EOF
+}
+
 case "$1" in
   webserver)
     airflow initdb
+    import_variables
     if [ "$AIRFLOW__CORE__EXECUTOR" = "LocalExecutor" ] || [ "$AIRFLOW__CORE__EXECUTOR" = "SequentialExecutor" ]; then
       # With the "Local" and "Sequential" executors it should all run in one container.
       airflow scheduler &
