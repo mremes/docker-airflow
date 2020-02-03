@@ -76,7 +76,7 @@ import_variables() {
 import json
 from airflow.models import Variable
 
-with open('./admin/variables.json') as f:
+with open("$VARIABLES_PATH") as f:
   variables = json.load(f)
   for k, v in variables.items():
     Variable.set(k, v)
